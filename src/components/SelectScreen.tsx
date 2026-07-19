@@ -1,21 +1,13 @@
 import { Box, Group, Paper, Stack, Text } from '@mantine/core'
+import { IconChevronRight, IconRocket } from '@tabler/icons-react'
 import type { RocketKey } from '../useLaunchControl'
 
 function RocketIcon() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-      <path d="M12 2C16 6 17.5 11 16.5 17L12 20L7.5 17C6.5 11 8 6 12 2Z" fill="var(--mantine-color-blue-6)" />
-      <circle cx="12" cy="9" r="1.6" fill="#fff" />
-    </svg>
-  )
+  return <IconRocket size={24} color="var(--mantine-color-blue-6)" />
 }
 
 function ChevronIcon() {
-  return (
-    <svg width="9" height="15" viewBox="0 0 8 14">
-      <path d="M1 1l6 6-6 6" stroke="#12151a" strokeOpacity={0.4} strokeWidth={2} fill="none" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+  return <IconChevronRight size={16} color="#12151a" opacity={0.4} />
 }
 
 export function SelectScreen({ onSelect }: { onSelect: (key: RocketKey) => void }) {
