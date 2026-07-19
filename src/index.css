@@ -1,5 +1,6 @@
 @keyframes lc-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
 @keyframes lc-blink { 0%, 100% { opacity: 1; } 50% { opacity: .15; } }
+@keyframes arm-sweep-spin { to { transform: rotate(360deg); } }
 
 html, body, #root {
   margin: 0;

@@ -1,4 +1,4 @@
-import { Box, Group, Paper, Stack, Text } from '@mantine/core'
+import { Box, Paper, Stack, Text } from '@mantine/core'
 import { IconChevronRight, IconRocket } from '@tabler/icons-react'
 import type { RocketKey } from '../useLaunchControl'
 
@@ -35,10 +35,7 @@ export function SelectScreen({ onSelect }: { onSelect: (key: RocketKey) => void 
             <RocketIcon />
           </Box>
           <Box style={{ flex: 1 }}>
-            <Group gap={8} align="center">
-              <Text fw={800} size="md">LFD #2</Text>
-              <Text size="10px" fw={800} style={{ letterSpacing: '.04em', color: 'var(--mantine-color-blue-6)', background: 'var(--mantine-color-blue-0)', padding: '3px 9px', borderRadius: 20 }}>LDF2</Text>
-            </Group>
+            <Text fw={800} size="md">LFD #2</Text>
             <Text size="sm" c="dimmed" mt={2}>Avec avionique · télémétrie live</Text>
           </Box>
           <ChevronIcon />

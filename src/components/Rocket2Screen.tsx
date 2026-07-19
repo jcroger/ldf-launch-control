@@ -1,9 +1,10 @@
-import { Box, Button, Group, Stack, Text, Title } from '@mantine/core'
+import { Box, Button, Stack, Text, Title } from '@mantine/core'
 import { IconCircleCheckFilled, IconRocket } from '@tabler/icons-react'
-import { badgeFor, durationText, fmt0, fmt1 } from '../format'
-import type { Rocket2State } from '../useLaunchControl'
+import { durationText, fmt0, fmt1 } from '../format'
+import { isChecklistReady, type ChecklistState, type Rocket2State } from '../useLaunchControl'
 import { ArmRing } from './ArmRing'
-import { StatusChips } from './StatusChips'
+import { ChecklistPanel } from './ChecklistPanel'
+import { StatusCards } from './StatusCards'
 
 interface Props {
   r2: Rocket2State
@@ -14,6 +15,7 @@ interface Props {
   onArmUp: () => void
   onTir: () => void
   onCancel: () => void
+  onToggleChecklist: (item: keyof ChecklistState) => void
 }
 
 function StatBlock({ label, value, unit, max }: { label: string; value: string; unit: string; max: string }) {
@@ -40,29 +42,22 @@ function StatRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, onArmUp, onTir, onCancel }: Props) {
-  const b = badgeFor(r2.status)
-  const showTelemetry = r2.phase === 'idle' || r2.phase === 'ascent'
+export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, onArmUp, onTir, onCancel, onToggleChecklist }: Props) {
+  const ready = isChecklistReady('r2', r2.checklist, continuityOk, radioOk)
+  const showTelemetry = r2.phase === 'ascent'
   const showDescent = r2.phase === 'descent' || r2.phase === 'landed'
 
   return (
     <Stack gap={0} style={{ minHeight: '100dvh', background: '#f7f8fa' }}>
-      <Box style={{ borderRadius: '0 0 28px 28px', background: b.bannerBg, padding: '16px 20px 18px' }}>
+      <Box style={{ borderRadius: '0 0 28px 28px', background: '#fff', padding: '16px 20px 18px' }}>
         <Button variant="subtle" size="compact-sm" disabled={r2.status !== 'TEST'} onClick={onBack}
-          styles={{ root: { color: b.bannerText, paddingLeft: 0 } }}>‹ Sélection</Button>
-        <Group gap={8} mt={10} align="center">
-          <Title order={4} style={{ color: b.bannerText }}>Fusée 2</Title>
-          <Text size="10px" fw={800} style={{ letterSpacing: '.04em', color: b.bannerText, background: 'rgba(255,255,255,0.28)', padding: '3px 9px', borderRadius: 20 }}>LDF2</Text>
-        </Group>
-        <Box style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <StatusChips continuityOk={continuityOk} radioOk={radioOk} />
-          <Box style={{ flex: 'none', display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.22)', borderRadius: 20, padding: '8px 12px' }}>
-            <Text size="xs" fw={800} style={{ color: b.bannerText }}>{b.text}</Text>
-          </Box>
-        </Box>
+          styles={{ root: { paddingLeft: 0 } }}>‹ Sélection</Button>
+        <Title order={4} mt={10}>Lulu Dynamic Falcon #2</Title>
       </Box>
 
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 20px 8px', gap: 12, overflow: 'auto' }}>
+        <StatusCards continuityOk={continuityOk} radioOk={radioOk} status={r2.status} />
+
         {r2.status === 'TIRE' && (
           <Box style={{ display: 'flex', alignItems: 'center', gap: 10, background: '#E7F7ED', borderRadius: 20, padding: '12px 14px' }}>
             <IconCircleCheckFilled size={18} color="#16A34A" />
@@ -71,6 +66,10 @@ export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, on
               <Text size="11px" c="dimmed" mt={1}>T+ {durationText(r2.firedAt, r2.landedAt)}</Text>
             </Box>
           </Box>
+        )}
+
+        {r2.status !== 'TIRE' && (
+          <ChecklistPanel rocketKey="r2" checklist={r2.checklist} continuityOk={continuityOk} radioOk={radioOk} onToggle={onToggleChecklist} />
         )}
 
         {showTelemetry && (
@@ -114,7 +113,7 @@ export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, on
       {r2.status !== 'TIRE' && (
         <Box style={{ padding: '0 20px 22px' }}>
           {r2.status === 'TEST' && (
-            <ArmRing size={88} progress={r2.armProgress} holding={r2.holding}
+            <ArmRing size={88} progress={r2.armProgress} holding={r2.holding} disabled={!ready}
               helperText="Maintenir 3 secondes pour armer" onDown={onArmDown} onUp={onArmUp} />
           )}
           {r2.status === 'ARME' && r2.countdown === null && (

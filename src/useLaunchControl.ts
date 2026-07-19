@@ -4,12 +4,42 @@ export type RocketKey = 'r1' | 'r2'
 export type RocketStatus = 'TEST' | 'ARME' | 'TIRE'
 export type ScreenKey = 'loading' | 'select' | 'rocket1' | 'rocket2'
 
+export interface ChecklistState {
+  parachute: boolean
+  ematchConnected: boolean
+  battery: boolean
+  zoneClear: boolean
+  spectators: boolean
+  inspected: boolean
+}
+
+export const CHECKLIST_ITEMS: { key: keyof ChecklistState; label: string }[] = [
+  { key: 'parachute', label: 'Parachute vérifié' },
+  { key: 'ematchConnected', label: 'E-match connectée physiquement' },
+  { key: 'battery', label: 'Batterie connectée' },
+  { key: 'zoneClear', label: 'Zone de lancement dégagée' },
+  { key: 'spectators', label: 'Spectateurs à distance de sécurité' },
+  { key: 'inspected', label: 'Fusée inspectée' },
+]
+
+const initialChecklist: ChecklistState = {
+  parachute: false, ematchConnected: false, battery: false,
+  zoneClear: false, spectators: false, inspected: false,
+}
+
+export function isChecklistReady(key: RocketKey, checklist: ChecklistState, continuityOk: boolean, radioOk: boolean) {
+  const manualDone = Object.values(checklist).every(Boolean)
+  const radioDone = key === 'r2' ? radioOk : true // N/A for r1
+  return manualDone && continuityOk && radioDone
+}
+
 export interface RocketState {
   status: RocketStatus
   armProgress: number
   holding: boolean
   countdown: number | null
   firedAt: number | null
+  checklist: ChecklistState
 }
 
 export interface Rocket2State extends RocketState {
@@ -25,7 +55,10 @@ export interface Rocket2State extends RocketState {
   landedAt: number | null
 }
 
-const initialR1: RocketState = { status: 'TEST', armProgress: 0, holding: false, countdown: null, firedAt: null }
+const initialR1: RocketState = {
+  status: 'TEST', armProgress: 0, holding: false, countdown: null, firedAt: null,
+  checklist: { ...initialChecklist },
+}
 const initialR2: Rocket2State = {
   ...initialR1,
   phase: 'idle', simT: 0, speed: 0, accel: 0, altitude: 0,
@@ -82,7 +115,14 @@ export function useLaunchControl() {
     timers.current.dur = setInterval(() => bump((x) => x + 1), 500)
   }
 
+  const toggleChecklistItem = (key: RocketKey, item: keyof ChecklistState) => {
+    if (live.current[key].status !== 'TEST') return
+    const checklist = { ...live.current[key].checklist, [item]: !live.current[key].checklist[item] }
+    setRocket(key, { checklist })
+  }
+
   const armDown = (key: RocketKey) => {
+    if (!isChecklistReady(key, live.current[key].checklist, continuityOk, radioOk)) return
     timers.current.holding[key] = true
     const start = performance.now()
     setRocket(key, { holding: true, armProgress: 0 })
@@ -188,6 +228,6 @@ export function useLaunchControl() {
 
   return {
     screen, continuityOk, radioOk, r1, r2,
-    armDown, armUp, tirClick, cancelCountdown, goBack, selectRocket,
+    armDown, armUp, tirClick, cancelCountdown, goBack, selectRocket, toggleChecklistItem,
   }
 }

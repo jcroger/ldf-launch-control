@@ -21,6 +21,7 @@ function App() {
         onArmUp={() => lc.armUp('r1')}
         onTir={() => lc.tirClick('r1')}
         onCancel={() => lc.cancelCountdown('r1')}
+        onToggleChecklist={(item) => lc.toggleChecklistItem('r1', item)}
       />
     )
   }
@@ -35,6 +36,7 @@ function App() {
       onArmUp={() => lc.armUp('r2')}
       onTir={() => lc.tirClick('r2')}
       onCancel={() => lc.cancelCountdown('r2')}
+      onToggleChecklist={(item) => lc.toggleChecklistItem('r2', item)}
     />
   )
 }

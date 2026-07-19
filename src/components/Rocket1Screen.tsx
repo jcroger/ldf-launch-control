@@ -1,9 +1,10 @@
 import { Box, Button, Stack, Text, Title } from '@mantine/core'
-import { IconCircleCheckFilled, IconRocketOff } from '@tabler/icons-react'
-import { badgeFor, durationText } from '../format'
-import type { RocketState } from '../useLaunchControl'
+import { IconCircleCheckFilled } from '@tabler/icons-react'
+import { durationText } from '../format'
+import { isChecklistReady, type ChecklistState, type RocketState } from '../useLaunchControl'
 import { ArmRing } from './ArmRing'
-import { StatusChips } from './StatusChips'
+import { ChecklistPanel } from './ChecklistPanel'
+import { StatusCards } from './StatusCards'
 
 interface Props {
   r1: RocketState
@@ -14,31 +15,25 @@ interface Props {
   onArmUp: () => void
   onTir: () => void
   onCancel: () => void
+  onToggleChecklist: (item: keyof ChecklistState) => void
 }
 
-export function Rocket1Screen({ r1, continuityOk, radioOk, onBack, onArmDown, onArmUp, onTir, onCancel }: Props) {
-  const b = badgeFor(r1.status)
+export function Rocket1Screen({ r1, continuityOk, radioOk, onBack, onArmDown, onArmUp, onTir, onCancel, onToggleChecklist }: Props) {
+  const ready = isChecklistReady('r1', r1.checklist, continuityOk, radioOk)
 
   return (
     <Stack gap={0} style={{ minHeight: '100dvh', background: '#f7f8fa' }}>
-      <Box style={{ borderRadius: '0 0 28px 28px', background: b.bannerBg, padding: '16px 20px 18px' }}>
+      <Box style={{ borderRadius: '0 0 28px 28px', background: '#fff', padding: '16px 20px 18px' }}>
         <Button variant="subtle" size="compact-sm" disabled={r1.status !== 'TEST'} onClick={onBack}
-          styles={{ root: { color: b.bannerText, paddingLeft: 0 } }}>‹ Sélection</Button>
-        <Title order={4} mt={10} style={{ color: b.bannerText }}>Fusée 1</Title>
-        <Box style={{ display: 'flex', gap: 8, marginTop: 12 }}>
-          <StatusChips continuityOk={continuityOk} radioOk={radioOk} />
-          <Box style={{ flex: 'none', display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.22)', borderRadius: 20, padding: '8px 12px' }}>
-            <Text size="xs" fw={800} style={{ color: b.bannerText }}>{b.text}</Text>
-          </Box>
-        </Box>
+          styles={{ root: { paddingLeft: 0 } }}>‹ Sélection</Button>
+        <Title order={4} mt={10}>Lulu Dynamic Falcon #1</Title>
       </Box>
 
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: 20, gap: 16, overflow: 'auto' }}>
+        <StatusCards continuityOk={continuityOk} radioOk={radioOk} status={r1.status} />
+
         {r1.status !== 'TIRE' ? (
-          <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10, background: '#fff', borderRadius: 20 }}>
-            <IconRocketOff size={48} color="var(--mantine-color-gray-4)" stroke={1.5} />
-            <Text size="sm" fw={700} style={{ color: 'var(--mantine-color-dark-4)', opacity: 0.6 }}>Prêt pour armement</Text>
-          </Box>
+          <ChecklistPanel rocketKey="r1" checklist={r1.checklist} continuityOk={continuityOk} radioOk={radioOk} onToggle={onToggleChecklist} />
         ) : (
           <Box style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 14, padding: '32px 16px', textAlign: 'center', background: '#fff', borderRadius: 20 }}>
             <IconCircleCheckFilled size={48} color="#16A34A" />
@@ -52,7 +47,7 @@ export function Rocket1Screen({ r1, continuityOk, radioOk, onBack, onArmDown, on
       {r1.status !== 'TIRE' && (
         <Box style={{ padding: '0 20px 26px' }}>
           {r1.status === 'TEST' && (
-            <ArmRing size={96} progress={r1.armProgress} holding={r1.holding}
+            <ArmRing size={96} progress={r1.armProgress} holding={r1.holding} disabled={!ready}
               helperText="Maintenir 3 secondes pour armer" onDown={onArmDown} onUp={onArmUp} />
           )}
           {r1.status === 'ARME' && r1.countdown === null && (
