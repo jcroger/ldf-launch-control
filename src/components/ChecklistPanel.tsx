@@ -1,62 +1,44 @@
 import { Box, Checkbox, Stack, Text } from '@mantine/core'
-import { IconCircleCheckFilled } from '@tabler/icons-react'
 import type { ReactNode } from 'react'
-import { CHECKLIST_ITEMS, type ChecklistState, type RocketKey } from '../useLaunchControl'
+import { CHECKLIST_ITEMS, type ChecklistState } from '../useLaunchControl'
 
 interface Props {
-  rocketKey: RocketKey
   checklist: ChecklistState
-  continuityOk: boolean
-  radioOk: boolean
   onToggle: (item: keyof ChecklistState) => void
 }
 
-function Row({ children }: { children: ReactNode }) {
+function Row({ children, onClick }: { children: ReactNode; onClick?: () => void }) {
   return (
-    <Box style={{
-      background: 'var(--mantine-color-gray-1)', borderRadius: 12, padding: '10px 14px',
-      display: 'flex', alignItems: 'center', gap: 10,
-    }}>
+    <Box
+      onClick={onClick}
+      style={{
+        background: 'var(--mantine-color-gray-2)', border: '1px solid var(--mantine-color-gray-4)',
+        borderRadius: 12, padding: '14px 16px',
+        display: 'flex', alignItems: 'center', gap: 12, cursor: onClick ? 'pointer' : 'default',
+      }}
+    >
       {children}
     </Box>
   )
 }
 
-export function ChecklistPanel({ rocketKey, checklist, continuityOk, radioOk, onToggle }: Props) {
-  const radioApplicable = rocketKey === 'r2'
-
+export function ChecklistPanel({ checklist, onToggle }: Props) {
   return (
-    <Stack gap={12}>
+    <Stack gap={14}>
       <Text ta="center" fw={800} size="xs" style={{ letterSpacing: '.08em' }}>CHECKLIST</Text>
-      <Stack gap={8}>
+      <Stack gap={12}>
         {CHECKLIST_ITEMS.map(({ key, label }) => (
-          <Row key={key}>
+          <Row key={key} onClick={() => onToggle(key)}>
             <Checkbox
               checked={checklist[key]}
               onChange={() => onToggle(key)}
-              size="sm"
+              onClick={(e) => e.stopPropagation()}
+              size="md"
+              styles={{ input: { cursor: 'pointer' } }}
             />
-            <Text size="sm">{label}</Text>
+            <Text size="md">{label}</Text>
           </Row>
         ))}
-
-        <Row>
-          <IconCircleCheckFilled size={20} color={continuityOk ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-gray-4)'} />
-          <Text size="sm" style={{ flex: 1 }}>Continuité E-match</Text>
-          <Text size="10px" c="dimmed" fw={700}>AUTO</Text>
-        </Row>
-
-        <Row>
-          {radioApplicable ? (
-            <IconCircleCheckFilled size={20} color={radioOk ? 'var(--mantine-color-green-6)' : 'var(--mantine-color-gray-4)'} />
-          ) : (
-            <IconCircleCheckFilled size={20} color="var(--mantine-color-gray-3)" />
-          )}
-          <Text size="sm" style={{ flex: 1, opacity: radioApplicable ? 1 : 0.4 }}>
-            Radio connectée{!radioApplicable && ' (N/A)'}
-          </Text>
-          <Text size="10px" c="dimmed" fw={700}>{radioApplicable ? 'AUTO' : ''}</Text>
-        </Row>
       </Stack>
     </Stack>
   )

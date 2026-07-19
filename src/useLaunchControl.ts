@@ -15,11 +15,11 @@ export interface ChecklistState {
 
 export const CHECKLIST_ITEMS: { key: keyof ChecklistState; label: string }[] = [
   { key: 'parachute', label: 'Parachute vérifié' },
-  { key: 'ematchConnected', label: 'E-match connectée physiquement' },
+  { key: 'inspected', label: 'Fusée inspectée' },
+  { key: 'ematchConnected', label: 'E-match connectée' },
   { key: 'battery', label: 'Batterie connectée' },
   { key: 'zoneClear', label: 'Zone de lancement dégagée' },
   { key: 'spectators', label: 'Spectateurs à distance de sécurité' },
-  { key: 'inspected', label: 'Fusée inspectée' },
 ]
 
 const initialChecklist: ChecklistState = {
@@ -66,6 +66,7 @@ const initialR2: Rocket2State = {
 }
 
 const BURNOUT = 2.6, APOGEE_T = 10, VBURN = 235, DESCENT_RATE = 5.5, HOLD_MS = 3000
+export const FIRE_COUNTDOWN_START = 10
 
 export function useLaunchControl() {
   const [screen, setScreen] = useState<ScreenKey>('loading')
@@ -89,7 +90,7 @@ export function useLaunchControl() {
   })
 
   useEffect(() => {
-    const t = setTimeout(() => setScreen('select'), 2500)
+    const t = setTimeout(() => setScreen('select'), import.meta.env.DEV ? 0 : 5000)
     return () => clearTimeout(t)
   }, [])
 
@@ -153,7 +154,7 @@ export function useLaunchControl() {
 
   const tirClick = (key: RocketKey) => {
     if (live.current[key].status !== 'ARME') return
-    setRocket(key, { countdown: 5 })
+    setRocket(key, { countdown: FIRE_COUNTDOWN_START })
     timers.current.cd[key] = setInterval(() => {
       const cur = live.current[key].countdown
       if (cur === null) return

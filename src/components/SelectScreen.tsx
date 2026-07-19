@@ -24,7 +24,7 @@ export function SelectScreen({ onSelect }: { onSelect: (key: RocketKey) => void 
             <RocketIcon />
           </Box>
           <Box style={{ flex: 1 }}>
-            <Text fw={800} size="md">LFD #1</Text>
+            <Text fw={800} size="md">LDF #1</Text>
             <Text size="sm" c="dimmed" mt={2}>Configuration standard</Text>
           </Box>
           <ChevronIcon />
@@ -35,7 +35,7 @@ export function SelectScreen({ onSelect }: { onSelect: (key: RocketKey) => void 
             <RocketIcon />
           </Box>
           <Box style={{ flex: 1 }}>
-            <Text fw={800} size="md">LFD #2</Text>
+            <Text fw={800} size="md">LDF #2</Text>
             <Text size="sm" c="dimmed" mt={2}>Avec avionique · télémétrie live</Text>
           </Box>
           <ChevronIcon />

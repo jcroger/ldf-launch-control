@@ -1,8 +1,18 @@
-@keyframes lc-pulse { 0%, 100% { opacity: 1; } 50% { opacity: .3; } }
-@keyframes lc-blink { 0%, 100% { opacity: 1; } 50% { opacity: .15; } }
+@keyframes lc-logo-zoom { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+@keyframes lc-loading-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes arm-sweep-spin { to { transform: rotate(360deg); } }
+@keyframes cd-zoom-blast {
+  0% { opacity: 0; transform: scale(.5); }
+  20% { opacity: 1; transform: scale(1); }
+  65% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(2.25); }
+}
 
 html, body, #root {
   margin: 0;
   min-height: 100dvh;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
 }

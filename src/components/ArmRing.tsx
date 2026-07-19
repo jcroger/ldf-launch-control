@@ -19,7 +19,10 @@ export function ArmRing({ size, progress, holding, helperText, disabled, onDown,
   return (
     <Stack align="center" gap={10}>
       <div
-        style={{ position: 'relative', width: size, height: size, touchAction: 'none', opacity: disabled ? 0.6 : 1 }}
+        style={{
+          position: 'relative', width: size, height: size, touchAction: 'none', opacity: disabled ? 0.6 : 1,
+          userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none',
+        }}
         onPointerDown={disabled ? undefined : onDown}
         onPointerUp={disabled ? undefined : onUp}
         onPointerLeave={disabled ? undefined : onUp}
@@ -42,8 +45,9 @@ export function ArmRing({ size, progress, holding, helperText, disabled, onDown,
         <div style={{
           position: 'absolute', inset: 8, borderRadius: '50%', background: coreBg,
           display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff',
-          fontWeight: 800, fontSize: 13, textAlign: 'center', lineHeight: 1.2,
+          fontWeight: 800, fontSize: Math.round(size * 0.15), textAlign: 'center', lineHeight: 1.2,
           cursor: disabled ? 'not-allowed' : 'pointer',
+          userSelect: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none',
         }}>ARMER</div>
       </div>
       <Text size="xs" c="dimmed" ta="center">

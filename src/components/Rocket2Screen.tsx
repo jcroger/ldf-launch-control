@@ -1,16 +1,17 @@
-import { Box, Button, Stack, Text, Title } from '@mantine/core'
+import { Box, Stack, Text } from '@mantine/core'
 import { IconCircleCheckFilled, IconRocket } from '@tabler/icons-react'
 import { durationText, fmt0, fmt1 } from '../format'
 import { isChecklistReady, type ChecklistState, type Rocket2State } from '../useLaunchControl'
 import { ArmRing } from './ArmRing'
 import { ChecklistPanel } from './ChecklistPanel'
+import { FireButton } from './FireButton'
+import { RadialCountdown } from './RadialCountdown'
 import { StatusCards } from './StatusCards'
 
 interface Props {
   r2: Rocket2State
   continuityOk: boolean
   radioOk: boolean
-  onBack: () => void
   onArmDown: () => void
   onArmUp: () => void
   onTir: () => void
@@ -42,19 +43,13 @@ function StatRow({ label, value }: { label: string; value: string }) {
   )
 }
 
-export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, onArmUp, onTir, onCancel, onToggleChecklist }: Props) {
+export function Rocket2Screen({ r2, continuityOk, radioOk, onArmDown, onArmUp, onTir, onCancel, onToggleChecklist }: Props) {
   const ready = isChecklistReady('r2', r2.checklist, continuityOk, radioOk)
   const showTelemetry = r2.phase === 'ascent'
   const showDescent = r2.phase === 'descent' || r2.phase === 'landed'
 
   return (
     <Stack gap={0} style={{ minHeight: '100dvh', background: '#f7f8fa' }}>
-      <Box style={{ borderRadius: '0 0 28px 28px', background: '#fff', padding: '16px 20px 18px' }}>
-        <Button variant="subtle" size="compact-sm" disabled={r2.status !== 'TEST'} onClick={onBack}
-          styles={{ root: { paddingLeft: 0 } }}>‹ Sélection</Button>
-        <Title order={4} mt={10}>Lulu Dynamic Falcon #2</Title>
-      </Box>
-
       <Box style={{ flex: 1, display: 'flex', flexDirection: 'column', padding: '16px 20px 8px', gap: 12, overflow: 'auto' }}>
         <StatusCards continuityOk={continuityOk} radioOk={radioOk} status={r2.status} />
 
@@ -68,8 +63,8 @@ export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, on
           </Box>
         )}
 
-        {r2.status !== 'TIRE' && (
-          <ChecklistPanel rocketKey="r2" checklist={r2.checklist} continuityOk={continuityOk} radioOk={radioOk} onToggle={onToggleChecklist} />
+        {r2.status === 'TEST' && (
+          <ChecklistPanel checklist={r2.checklist} onToggle={onToggleChecklist} />
         )}
 
         {showTelemetry && (
@@ -108,29 +103,33 @@ export function Rocket2Screen({ r2, continuityOk, radioOk, onBack, onArmDown, on
             </Stack>
           </Stack>
         )}
-      </Box>
 
-      {r2.status !== 'TIRE' && (
-        <Box style={{ padding: '0 20px 22px' }}>
-          {r2.status === 'TEST' && (
-            <ArmRing size={88} progress={r2.armProgress} holding={r2.holding} disabled={!ready}
+        {r2.status === 'TEST' && (
+          <Box style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', paddingBottom: 12 }}>
+            <ArmRing size={130} progress={r2.armProgress} holding={r2.holding} disabled={!ready}
               helperText="Maintenir 3 secondes pour armer" onDown={onArmDown} onUp={onArmUp} />
-          )}
-          {r2.status === 'ARME' && r2.countdown === null && (
-            <Stack gap={10}>
-              <Text size="xs" fw={700} ta="center" c="orange.8">● Système armé — confirmez le tir</Text>
-              <Button size="xl" radius="lg" onClick={onTir}>TIR</Button>
+          </Box>
+        )}
+        {r2.status === 'ARME' && r2.countdown === null && (
+          <>
+            <Box style={{ flex: 1 }} />
+            <Stack align="center" gap={16} style={{ padding: '0 0 22px' }}>
+              <Text size="lg" fw={800} ta="center" c="orange.8">Système armé : confirmer le tir</Text>
+              <FireButton size={130} label="TIR" color="blue" spinning={false} onClick={onTir} />
             </Stack>
-          )}
-          {r2.countdown !== null && (
-            <Stack align="center" gap={10}>
-              <Text style={{ fontSize: 50, fontWeight: 800, color: '#DC2626', lineHeight: 1, animation: 'lc-blink 1s steps(1) infinite' }}>{r2.countdown}</Text>
+          </>
+        )}
+        {r2.countdown !== null && (
+          <>
+            <Box style={{ flex: 1 }} />
+            <Stack align="center" gap={16} style={{ padding: '0 0 22px' }}>
+              <RadialCountdown value={r2.countdown} size={140} />
               <Text size="sm" c="dimmed">Envoi de la commande de tir…</Text>
-              <Button fullWidth size="lg" radius="lg" variant="outline" color="red" onClick={onCancel}>ANNULER</Button>
+              <FireButton size={130} label="ANNULER" color="red" spinning={false} onClick={onCancel} />
             </Stack>
-          )}
-        </Box>
-      )}
+          </>
+        )}
+      </Box>
     </Stack>
   )
 }

@@ -16,7 +16,6 @@ function App() {
         r1={lc.r1}
         continuityOk={lc.continuityOk}
         radioOk={lc.radioOk}
-        onBack={lc.goBack}
         onArmDown={() => lc.armDown('r1')}
         onArmUp={() => lc.armUp('r1')}
         onTir={() => lc.tirClick('r1')}
@@ -31,7 +30,6 @@ function App() {
       r2={lc.r2}
       continuityOk={lc.continuityOk}
       radioOk={lc.radioOk}
-      onBack={lc.goBack}
       onArmDown={() => lc.armDown('r2')}
       onArmUp={() => lc.armUp('r2')}
       onTir={() => lc.tirClick('r2')}
